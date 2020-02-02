@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const URI = 'mongodb://localhost/stats-fullstack';
+const URI = process.env.MONGO_URL;
 
 mongoose.connect(URI)
     .then(db => console.log('DB connected'))
