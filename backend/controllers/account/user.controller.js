@@ -57,13 +57,13 @@ userController.login = (req,res,err) =>{
                 });
             }
 
-            const user = {
+            let userToken = {
                 username: req.body.userName,
                 id: user._id
             }
-            const token = authService.generateToken(user);
+            let token = authService.generateToken(userToken);
 
-            userModel.findByIdAndUpdate(user._id, {
+            userModel.findByIdAndUpdate({_id:user._id}, {
                 $set: {
                     lastLogin: Date.now
                 }
@@ -101,3 +101,87 @@ userController.usernameValidate = (req,res,err)=>{
     }))
 };
 
+/**
+ * 
+ */
+userController.relogin = (req,res,err)=>{
+    let userToken = {
+        id: req.user.id,
+        username: req.user.username
+    }
+    let newToken = authService.generateToken(userToken);
+
+    userModel.findOne({_id: req.user.id}).then(user =>{
+        if(user === null){
+            res.send({
+                ok: false,
+                message: "User doesnt exist"
+            })
+        } else{
+            res.send({
+                ok:true,
+                body: {
+                    user: user,
+                    token: token
+                }
+            })
+        }
+    }).catch(err =>{
+        res.send({
+            ok:false,
+            message: "Error finding user"
+        })
+    })
+};
+
+/**
+ * 
+ */
+userController.getUserByUsername = (req,res,err) =>{
+    let user = req.params.user;
+    if(user === null){
+        res.send({
+            ok: false,
+            message: "'user' param required"
+        })
+    }
+
+    userModel.findOne({userName: user}).then(user => {
+        if(user === null){
+            res.send({
+                ok:false,
+                message: "User dont exist"
+            })
+            return
+        }
+
+        res.send({
+            ok: true,
+            body: {
+                _id: user.id
+                //datos devueltos para busqueda de perfil
+            }
+        })
+    }).catch(err =>{
+        res.send({
+            ok: false,
+            message: "Erorr getting user data"
+        })
+    })
+}
+
+/**
+ * 
+ */
+userController.updateProfile = () =>{
+
+}
+
+/**
+ * 
+ */
+userController.deleteUser = () =>{
+    
+}
+
+module.exports = userController;
