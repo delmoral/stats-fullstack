@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const session = require('./session');
 
 const sportSchema = new Schema({
     userId: { type: String, required: true },
-    sessions: { type: [session] , ref: "Product"}
+    sessions: [{ type: Schema.Types.ObjectId , ref: "Session"}]
 });
 
-module.exports = mongoose.model('Profile', sportSchema);
+module.exports = mongoose.model('Sport', sportSchema);

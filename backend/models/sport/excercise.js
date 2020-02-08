@@ -9,4 +9,4 @@ const excerciseSchema = new Schema({
     //restTime: {},
 });
 
-module.exports = mongoose.model('Profile', excerciseSchema);
+module.exports = mongoose.model('Exercise', excerciseSchema);

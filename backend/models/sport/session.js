@@ -1,13 +1,12 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const excercise = require('./excercise');
 
 const sessionSchema = new Schema({
     sportId: { type: String, required: true },
-    sessionDate: {type: [Date]},
-    startTime: {type: Date, default: Date.now},
-    endTime: {type: Date },
-    excercises: { type: [excercise] } 
+    sessionDate: [Date],
+    startTime: { type: Date },
+    endTime: { type: Date },
+    excercises: [{ type: Schema.Types.ObjectId ,ref:'Excercise' }]
 });
 
-module.exports = mongoose.model('Profile', sessionSchema);
+module.exports = mongoose.model('Session', sessionSchema);

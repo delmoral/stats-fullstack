@@ -7,7 +7,7 @@ const userSchema = new Schema({
     userName: { type: String, unique: true, index: true, uniqueCaseInsensitive: true , required: true },
     password: { type: String, required: true },
     email: { type: String, required: true },
-    phoneNumber: String,
+    phoneNumber: Number,
     avatar: { type: String, default: null},
     creationDate: { type: Date, default: Date.now },
     lastLogin: { type: Date, default: Date.now}//,
@@ -24,4 +24,4 @@ profileSchema.query.byUsername = (username) =>{
     return this.find({userName: username})
 };
 
-module.exports = mongoose.model('Profile', userSchema);
+module.exports = mongoose.model('User', userSchema);

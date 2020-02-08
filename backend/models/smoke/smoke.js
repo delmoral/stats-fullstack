@@ -6,4 +6,4 @@ const smokeSchema = new Schema({
     spent: { type: Number, default: 0}
 });
 
-module.exports = mongoose.model('Profile', smokeSchema);
+module.exports = mongoose.model('Smoke', smokeSchema);

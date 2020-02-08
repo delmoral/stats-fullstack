@@ -8,11 +8,13 @@ const smokeCountSchema = new Schema({
     cigarretes: { type: Number, default: 0}
 });
 
+/*
 // La fecha es única, comprobar que existe, y entonces crear nuevo smokeCount
 profileSchema.plugin(uniqueValidator, { message: 'El {PATH} to be unique.'});
 
-profileSchema.query.bySmokeDate = (smokeDate) =>{
-    return this.find({userName: username})
+profileSchema.query.bySmokeDate = (smokedate) =>{
+    return this.find({smokeDate: smokedate})
 };
+*/
 
-module.exports = mongoose.model('Profile', smokeCountSchema);
+module.exports = mongoose.model('SmokeCount', smokeCountSchema);

@@ -8,4 +8,4 @@ const smokeProductSchema = new Schema({
     price: { type: Number, default: 0 }
 });
 
-module.exports = mongoose.model('Profile', smokeProductSchema);
+module.exports = mongoose.model('SmokeProduct', smokeProductSchema);
