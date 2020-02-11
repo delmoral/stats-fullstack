@@ -7,9 +7,9 @@ const userController = {};
 /**
  * Crear nuevo perfil
  * req.body: name, userName, password, email, phoneNumber, avatar
- * res: ok
+ * res: ok / ko
  */
-userController.singup = (req, res, err) => {
+userController.singup = async (req, res, err) => {
     const newUser = new userModel({
         name: req.body.name,
         userName: req.body.userName,
@@ -18,40 +18,41 @@ userController.singup = (req, res, err) => {
         phoneNumber: req.body.phoneNumber,
         avatar: req.body.avatar
     });
-
-    newUser.save().then(()=>{
+    try{
+        await newUser.save();
         res.send({
             ok: true,
             body: {
                 profile: newProfile
             }
-        })
-    }).catch(err =>{
+        });
+    }catch(err){
         res.send({
             ok: false,
             message: 'error: '+err
         })
-    });
+    }
 };
 
 /**
  * Inicia sesión dado un usuario y contraseña
  * req: userName, password
- * res: if(ok) -> ok, body.user, body.token
+ * res: ok, body.user, body.token / ko
  */
-userController.login = (req,res,err) =>{
-    userModel.findOne({ userName: req.body.userName}).then(user =>{
-        if(user == null){
+userController.login = async (req,res,err) =>{
+    try{
+        let user = await userModel.findOne({ userName: req.body.userName});
+        if(user === null){
             res.send({
                 ok: false,
                 message: 'User not found'
             })
-            return
+            //return
         }
-
+        
         bcrypt.compare(req.body.password, user.password, (err, valid) =>{
             if(!"valid"){
-                return res.send({
+                res.send({
                     ok: false,
                     message: "Invalid password"
                 });
@@ -63,7 +64,7 @@ userController.login = (req,res,err) =>{
             }
             let token = authService.generateToken(userToken);
 
-            userModel.findByIdAndUpdate({_id:user._id}, {
+            await userModel.findByIdAndUpdate({_id:user._id}, {
                 $set: {
                     lastLogin: Date.now
                 }
@@ -72,46 +73,53 @@ userController.login = (req,res,err) =>{
             res.send({
                 ok: true,
                 body: {
-                    user: user,
-                    token: token
-                }
+                    user: user
+                },
+                token: token
 
             })
         })
-    })
+    }catch(err){
+        res.send({
+            ok: false,
+            message: 'Error logging in: '+err
+        })
+    }
 };
 
 /**
  * Validar campo Unico userName
  * req.params: username
- * res: ok/ko
+ * res: ok / ko
  */
 userController.usernameValidate = (req,res,err)=>{
-    userModel.find({ userName: req.params.username}).then((users) =>{
+    try{
+        await userModel.find({ userName: req.params.username});
         if(users.length > 0) throw {message: 'User used'}
         res.status(200).send({
             ok:true,
             message: 'User avaible'
         })
-    }).catch((err=>{
+    }catch(err){
         res.status(200).send({
             ok:false,
             message: 'User unavaible'
         })
-    }))
+    }
 };
 
 /**
  * 
  */
-userController.relogin = (req,res,err)=>{
+userController.relogin = async (req,res,err)=>{
     let userToken = {
         id: req.user.id,
         username: req.user.username
     }
     let newToken = authService.generateToken(userToken);
 
-    userModel.findOne({_id: req.user.id}).then(user =>{
+    try{
+        await userModel.findOne({_id: req.user.id});
         if(user === null){
             res.send({
                 ok: false,
@@ -122,22 +130,25 @@ userController.relogin = (req,res,err)=>{
                 ok:true,
                 body: {
                     user: user,
-                    token: token
-                }
+                    
+                }, 
+                token: newToken
             })
         }
-    }).catch(err =>{
+    }catch(err){
         res.send({
             ok:false,
             message: "Error finding user"
         })
-    })
+    }
 };
 
 /**
- * 
+ * Recibe el nombre de usuario y devuelve objeto User
+ * req.params: username
+ * res: ok, User / ko
  */
-userController.getUserByUsername = (req,res,err) =>{
+userController.getUserByUsername = async (req,res,err) =>{
     let user = req.params.user;
     if(user === null){
         res.send({
@@ -145,8 +156,8 @@ userController.getUserByUsername = (req,res,err) =>{
             message: "'user' param required"
         })
     }
-
-    userModel.findOne({userName: user}).then(user => {
+    try{
+        await userModel.findOne({userName: username})
         if(user === null){
             res.send({
                 ok:false,
@@ -154,7 +165,6 @@ userController.getUserByUsername = (req,res,err) =>{
             })
             return
         }
-
         res.send({
             ok: true,
             body: {
@@ -162,26 +172,80 @@ userController.getUserByUsername = (req,res,err) =>{
                 //datos devueltos para busqueda de perfil
             }
         })
-    }).catch(err =>{
+    }catch(err){
         res.send({
             ok: false,
             message: "Erorr getting user data"
         })
-    })
+    }
+}
+
+/**
+ * Recibe nombre de usuario y avatar (gestionado con multer) y actualiza ese campo del perfil
+ * req.body: userName, avatar
+ * req: ok, message / ko, message
+ */
+userController.updateAvatar = async (req, res, err) =>{
+    let username = req.body.username;
+    const newAvatar = {
+        avatar: req.body.avatar
+    }
+
+    try{
+        await userModel.update({ userName: username }, newAvatar);
+        res.send({
+            ok:true,
+            message: "Avatar updated"
+        });
+    } catch(err){
+        res.send({
+            ok:false,
+            message: "Error updating avatar"
+        })
+    }
+}
+
+/**
+ * Recibe un body User y actualiza el perfil con los campos recibidos.
+ * req.body: name, password, email, phoneNumber
+ * res: ok, message / ko, message
+ */
+userController.updateProfile = async (res, res, err) =>{
+    let username = req.body.user.userName;
+    const updates = {
+        name: req.body.name,
+        
+    }
+    try{
+        await userModel.update({userName: username}, req.body.user);
+        res.send({
+            ok:true,
+            message: "User updated"
+        });
+    } catch(err){
+        res.send({
+            ok:false,
+            message: "Error updating user: " + err
+        });
+    }
 }
 
 /**
  * 
  */
-userController.updateProfile = () =>{
-
-}
-
-/**
- * 
- */
-userController.deleteUser = () =>{
-    
+userController.deleteUser = async (req,res,err) =>{
+    try{
+        await userModel.findByIdAndDelete(req.params.id);
+        res.res({
+            ok: true,
+            message: "User deleted"
+        })
+    } catch(err){
+        res.send({
+            ok:false,
+            message: "Error deleting user"
+        })
+    }
 }
 
 module.exports = userController;
