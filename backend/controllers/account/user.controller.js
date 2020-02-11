@@ -1,11 +1,13 @@
 const userModel = require('../../models/account/user');
+const sportModel = require('../../models/sport/sport');
+const smokeModel = require('../../models/smoke/smoke');
 const authService = require('../../services/auth.service');
 const bcrypt = require('bcrypt');
 
 const userController = {};
 
 /**
- * Crear nuevo perfil
+ * Crear nuevo perfil - crea también Sport y Smoke...
  * req.body: name, userName, password, email, phoneNumber, avatar
  * res: ok / ko
  */
@@ -18,12 +20,30 @@ userController.singup = async (req, res, err) => {
         phoneNumber: req.body.phoneNumber,
         avatar: req.body.avatar
     });
+    //let newSport;
+    let newSmoke;
+    let userID;
+    // Crear nuevo Sport y Smoke asociados a la id que genera el nuevo User
     try{
-        await newUser.save();
+        await newUser.save((user)=>{
+            newUserID = user._id;
+        });
+// Es correcto varias awaits?
+        const newSport = await new sportModel({
+            userId: newUserID,
+            sessions: []
+        }).save();
+
+        const newSmoke = await new smokeModel({
+            userId: newUserID,
+            spent: 0,
+            consumed: 0
+        }).save();
+
         res.send({
             ok: true,
             body: {
-                profile: newProfile
+                profile: newUser
             }
         });
     }catch(err){
@@ -230,6 +250,7 @@ userController.updateProfile = async (res, res, err) =>{
     }
 }
 
+// Falta contemplar el borrado de los Sport, Smoke y demás objetos asociados
 /**
  * 
  */
