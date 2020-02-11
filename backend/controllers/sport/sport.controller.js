@@ -14,7 +14,6 @@ const sportController = {}
 sportController.findSportById = (req, res, err) => {
     let sport = await sportModel.findOne( {userId: req.params.userId});
     if(sport === null){
-        
         res.send({
             ok: false,
             body: {
@@ -22,10 +21,26 @@ sportController.findSportById = (req, res, err) => {
             }
         })
         //return
+    } else{
+        res.send({
+            ok: false,
+            message: "No sport found"
+        })
     }
 }
 
-sportController.addSession = () =>  {
+/**
+ * Recibe idSesion, lee la lista de sesiones y la añade al final.
+ * 
+ */
+sportController.addSession = (req, res, err) =>  {
+
+}
+
+/**
+ * Busca el idSesion en la lista y lo elimina. (Debería borrar la sesión?)
+ */
+sportController.removeSession = (req, res, err) => {
 
 }
 

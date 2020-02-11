@@ -11,4 +11,8 @@ const sessionController = {}
 // Añadir ejercicio a lista
 // Borrar ejercicio de lista
 
+sessionController.createSession = (req,res,err) =>{
+    
+}
+
 module.exports = sessionController;
