@@ -1,17 +1,50 @@
 const sportModel = require('../../models/sport/sport');
-// ¿sessionModel y exerciseModel?
+const sessionModel = require('../../models/sport/session');
+
+// TODOs
 
 const sportController = {}
 
-// Encontrar Sport por userID
-// Añadir sesión a la lista
-// eliminar sesión de la lista
+// Crear Sport nuevo                X~~
+// Borrar Sport                      ~~
+// Encontrar Sport por userID       X~~
+// Añadir sesión a la lista         X
+// eliminar sesión de la lista      X
 
 
-/**
+/** POST
+ * Crea Sport a partir de un id de usuario proporcionado. 
+ * --Sin embargo esto debería ocurrir en la creación del User.
+ * req.body: id
+ * res: ok / ko
+ */
+sportController.createSport = async (req,res,err)=>{
+    const sport = new sportModel({
+        userId: req.body.id
+    })
+    await sport.save();
+
+    res.send({
+        ok: true,
+        message: 'Sport created'
+    })
+}
+
+/** POST
+ * Borra Sport a partir de un id de usuario proporcionado.
+ * --Sin embargo esto debería ocurrir en la creación del User.
+ */
+sportController.deleteSport = () =>{
+
+}
+
+/** GET
  * Busca y devuelve un Sport por id de usuario
+ * req.params: userID
+ * res.body: sport
  */
 sportController.findSportById = (req, res, err) => {
+    // HAY QUE RELLENAR EL SPORT CON LAS SESSIONES -> POPULATE
     let sport = await sportModel.findOne( {userId: req.params.userId});
     if(sport === null){
         res.send({
@@ -29,19 +62,34 @@ sportController.findSportById = (req, res, err) => {
     }
 }
 
-/**
- * Recibe idSesion, lee la lista de sesiones y la añade al final.
+/** POST
+ * Recibe sportID y sessionID y actualiza la lista de sesiones.
+ * req.params: sportID, sessionID
  * 
+ * res: ok / ko
  */
-sportController.addSession = (req, res, err) =>  {
-
+sportController.addSession = async (req, res, err) =>  {
+    // Añadimos con push la nueva sesión YA EXISTENTE
+    sportModel.findOneAndUpdate({_id: req.params.sportId}, {$push: {sessions: req.params.sessionId}});
+    res.send({
+        ok: true,
+        message: 'Session ' + req.body.sessionId + ' added to sportID '+ req.body.sportId
+    });
 }
 
-/**
- * Busca el idSesion en la lista y lo elimina. (Debería borrar la sesión?)
+/** POST/DELETE
+ * Busca el idSesion en la lista y lo elimina. También elimina la sesión. (Debería borrar la sesión? y los ejercicios?)
+ * req.params: sportID, sessionID 
+ * res: ok / ko
  */
-sportController.removeSession = (req, res, err) => {
-
+sportController.removeSession = async (req, res, err) => {
+    // Borra UNA sesion
+    await sportModel.findOneAndUpdate({_id: req.params.sportId}, {$pull: {_id: req.params.sessionId}});
+    await sessionModel.findByIdAndDelete(req.params.sessionId);
+    res.send({
+        ok: true,
+        message: 'Sessions removed from sportID '+ req.body.sportId
+    })
 }
 
 module.exports = sportController;

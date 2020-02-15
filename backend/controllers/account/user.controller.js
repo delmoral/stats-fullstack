@@ -4,7 +4,21 @@ const smokeModel = require('../../models/smoke/smoke');
 const authService = require('../../services/auth.service');
 const bcrypt = require('bcrypt');
 
+// TODOs - definir metodos HTTP
+
 const userController = {};
+
+// Crear nueva cuenta               X
+// Iniciar sesión                   X
+
+// Validar campo único userName     X
+// Pedir nuevo Token                X
+
+// Buscar perfil de usuario         X
+// Actualizar foto de perfil        X
+// Actualizar perfil de usuario     X
+
+// Borrar perfil de usuario         X~~
 
 /**
  * Crear nuevo perfil - crea también Sport y Smoke...
@@ -43,6 +57,7 @@ userController.singup = async (req, res, err) => {
         res.send({
             ok: true,
             body: {
+                // No devolver password aquí
                 profile: newUser
             }
         });

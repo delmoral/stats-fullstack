@@ -1,6 +1,6 @@
-const excerciseModel = require('../../models/sport/excercise');
+const exerciseModel = require('../../models/sport/exercise');
 
-const excerciseController = {}
+const exerciseController = {}
 
 // Ver todos los ejercicios
 
@@ -10,4 +10,4 @@ const excerciseController = {}
 
 // Añadir serie (indicando repeticiones)
 
-module.exports = excerciseController;
+module.exports = exerciseController;
