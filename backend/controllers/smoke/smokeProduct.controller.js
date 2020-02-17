@@ -9,4 +9,6 @@ smokeProductController = {}
 // Editar producto - actualiza spent de Smoke padre
 // Borrar producto - actualiza spent de Smoke padre
 
+
+
 module.exports = smokeProductController;

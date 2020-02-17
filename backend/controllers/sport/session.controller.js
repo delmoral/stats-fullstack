@@ -108,6 +108,7 @@ sessionController.editSession = async (req,res,err) =>{
         startTime: req.body.startTime,
         endTime: req.body.endTime
     }
+    // MongoDB ¿set?
     await sessionModel.findByIdAndUpdate(id, {$set: session});
     res.send({
         ok: true,
