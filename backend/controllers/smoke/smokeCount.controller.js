@@ -1,4 +1,5 @@
 const smokeCountModel = require('../../models/smoke/smokeCount');
+const smokeModel = require('../../models/smoke/smoke');
 
 smokeCountController = {}
 
@@ -23,7 +24,7 @@ smokeCountController.createSmokeCountByDate = async (req,res,err) =>{
         const newSmokeCount = new smokeCountModel({
             smokeId: req.body.smokeId,
             smokeDate: req.body.smokeDate,
-            cigarretes: 0
+            cigs: 0
         })
         await newSmokeCount.save();
         res.send({
@@ -74,14 +75,17 @@ smokeCountController.findSmokeByDateAndSmokeId = async (req,res,err) =>{
 
 /** POST
  * Recibe un SmokeCount y actualiza el valor de cigarretes +1  
- * -- actualiza consumed de Smoke padre
- * req.body: SmokeCount
+ * OK? -- actualiza consumed de Smoke padre
+ * req.body: SmokeCount(smokeId,smokeDate, cigs)
  * res: ok / ko
  */
 smokeCountController.addCigarrete = async (req,res,err) =>{
     let id = req.body.smokeCount._id;
+    let smokeId = req.body.smokeCount.smokeId;
     try{
         await smokeCountModel.findByIdAndUpdate(id, {$set: {cigarretes: req.body.smokeCount.cigarretes + 1}});
+        const {consumed} = await smokeModel.findById(smokeId);
+        await smokeModel.findByIdAndUpdate(smokeId, {$set: {consumed: consumed}})
         res.send({
             ok: true,
             message: 'Smoke Count updated'
@@ -96,7 +100,7 @@ smokeCountController.addCigarrete = async (req,res,err) =>{
 
 /** POST
  * Recibe un smokeCount y actualiza el valor de cigarretes -1
- * -- actualiza consumed de Smoke padre
+ * OK? -- actualiza consumed de Smoke padre
  * req.body: smokeCount
  * res: ok / ko
  */
@@ -104,6 +108,8 @@ smokeCountController.deleteCigarrete = async (req,res,err) =>{
     let id = req.body.smokeCount._id;
     try{
         await smokeCountModel.findByIdAndUpdate(id, {$set: {cigarretes: req.body.smokeCount.cigarretes - 1}});
+        const {consumed} = await smokeModel.findById(smokeId);
+        await smokeModel.findByIdAndUpdate(smokeId, {$set: {consumed: consumed + 1}})
         res.send({
             ok: true,
             message: 'Smoke Count updated'

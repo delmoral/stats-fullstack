@@ -34,7 +34,7 @@ smokeController.updateSpend = (req,res,err) =>{
 /**
  * 
  */
-smokeController.updateSpend = (req,res,err) =>{
+smokeController.updateConsumed = (req,res,err) =>{
 
 }
 

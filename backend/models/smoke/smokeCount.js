@@ -6,7 +6,7 @@ const smokeCountSchema = new Schema({
     smokeId: { type: String, required: true },
     // Fecha formato Number ddMMyy?
     smokeDate: { type: Date, default: Date.now },
-    cigarretes: { type: Number, default: 0}
+    cigs: { type: Number, default: 0}
 });
 
 /*
