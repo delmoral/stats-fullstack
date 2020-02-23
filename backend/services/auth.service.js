@@ -8,7 +8,7 @@ authService.generateToken = (user) =>{
         id: user.id
     }
 
-    return token = jwt.sign(u, '1234', {
+    return token = jwt.sign(u, process.env.TOKEN_SECRET, {
         expiresIn: 60*60*24
     })
 }
