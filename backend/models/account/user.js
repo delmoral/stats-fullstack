@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
+//const uniqueValidator = require('mongoose-unique-validator');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -18,9 +18,9 @@ const userSchema = new Schema({
 
 });
 
-profileSchema.plugin(uniqueValidator, { message: 'El {PATH} to be unique.'});
+//userSchema.plugin(uniqueValidator, { message: 'El {PATH} to be unique.'});
 
-profileSchema.query.byUsername = (username) =>{
+userSchema.query.byUsername = (username) =>{
     return this.find({userName: username})
 };
 

@@ -77,6 +77,8 @@ userController.singup = async (req, res, err) => {
 userController.login = async (req,res,err) =>{
     try{
         let user = await userModel.findOne({ userName: req.body.userName});
+        let token;
+        let valid = false;
         if(user === null){
             res.send({
                 ok: false,
@@ -97,23 +99,25 @@ userController.login = async (req,res,err) =>{
                 username: req.body.userName,
                 id: user._id
             }
-            let token = authService.generateToken(userToken);
+            token = authService.generateToken(userToken);
 
-            await userModel.findByIdAndUpdate({_id:user._id}, {
-                $set: {
-                    lastLogin: Date.now
-                }
-            })
-            
-            res.send({
-                ok: true,
-                body: {
-                    user: user
-                },
-                token: token
-
-            })
+            valid = true;
         })
+
+        let updatedUser = await userModel.findByIdAndUpdate({_id:user._id}, {
+            $set: {
+                lastLogin: Date.now
+            }
+        })
+        
+        res.send({
+            ok: true,
+            body: {
+                user: updatedUser
+            },
+            token: token
+        })
+
     }catch(err){
         res.send({
             ok: false,
@@ -127,7 +131,7 @@ userController.login = async (req,res,err) =>{
  * req.params: username
  * res: ok / ko
  */
-userController.usernameValidate = (req,res,err)=>{
+userController.usernameValidate = async (req,res,err)=>{
     try{
         await userModel.find({ userName: req.params.username});
         if(users.length > 0) throw {message: 'User used'}
@@ -245,7 +249,7 @@ userController.updateAvatar = async (req, res, err) =>{
  * req.body: name, password, email, phoneNumber
  * res: ok, message / ko, message
  */
-userController.updateProfile = async (res, res, err) =>{
+userController.updateProfile = async (req, res, err) =>{
     let username = req.body.user.userName;
     const updates = {
         name: req.body.name,

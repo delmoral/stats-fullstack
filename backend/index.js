@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cors({origin: process.env.ANGULAR_URL}));
 
 // Routes
-app.use('/api/user', require('./routes/user.routes'));
+app.use('/api/user', require('./routes/account/user.routes'));
 
 // Starting
 app.listen(app.get('port'), ()=>{
